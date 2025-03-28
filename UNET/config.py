@@ -1,0 +1,16 @@
+# Configuration settings
+IMAGE_SIZE = (256, 256)
+INPUT_CHANNELS = 1  # GRAY images
+OUTPUT_CHANNELS = 1  # Binary masks
+BATCH_SIZE = 4
+EPOCHS = 10
+TRAIN_IMG_NUM = 1520
+VALIDATION_IMG_NUM = 21
+PRETRAINED_WEIGHTS = "Unet.keras"
+DATA_DIR = "data"
+TRAIN_DIR = f"{DATA_DIR}/train"
+VALIDATION_DIR = f"{DATA_DIR}/validation"
+IMAGE_FOLDER = "images"
+MASK_FOLDER = "masks"
+PATIENCE = 20
+IS_GRAY_IMAGE = True
