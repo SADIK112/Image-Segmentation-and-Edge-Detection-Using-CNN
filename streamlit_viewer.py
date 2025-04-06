@@ -5,8 +5,10 @@ import matplotlib.pyplot as plt
 from skimage import measure
 import pandas as pd
 import streamlit as st
-from UNET.model import Unet
-from UNET.config import PRETRAINED_WEIGHTS, IMAGE_SIZE
+import seaborn as sns
+from UNET.unet_baseline import Unet as UnetBaseline
+from UNET.unet_improved import Unet as UnetImproved
+from UNET.config import PRETRAINED_WEIGHTS, IMAGE_SIZE, IS_GRAY_IMAGE
 
 
 def preprocess_image(image):
@@ -94,7 +96,6 @@ def findParameters(image, mask):
         labels,
         intensity_image=image,
         properties=[
-            "label",
             "area",
             "equivalent_diameter",
             "mean_intensity",
@@ -104,8 +105,44 @@ def findParameters(image, mask):
 
     # Convert to a DataFrame
     df = pd.DataFrame(props)
+    df['label'] = df.index
     return df  # Return the DataFrame instead of printing it
 
+
+
+def plotRockImageFeatures(df):
+    # Correlation heatmap
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    corr = df.corr()
+    st.bar_chart(df.set_index('label')['equivalent_diameter'])
+    sns.heatmap(corr, annot=True, cmap='coolwarm', fmt='.2f', ax=ax)
+    plt.title("Correlation Heatmap")
+    st.pyplot(fig)
+    
+    # Box plot for features
+    fig_box, ax_box = plt.subplots(figsize=(10, 6))
+    sns.boxplot(data=df, ax=ax_box)
+    plt.title("Box Plot of Features")
+    st.pyplot(fig_box)
+    
+    # Histogram for equivalent_diameter
+    fig_hist, ax_hist = plt.subplots(figsize=(10, 6))
+    sns.histplot(df['equivalent_diameter'], kde=True, ax=ax_hist)
+    plt.title("Histogram of Equivalent Diameter")
+    st.pyplot(fig_hist)
+    
+    # Scatter plot between area and equivalent_diameter
+    fig_scatter, ax_scatter = plt.subplots(figsize=(10, 6))
+    sns.scatterplot(data=df, x='area', y='equivalent_diameter', ax=ax_scatter)
+    plt.title("Scatter Plot: Area vs Equivalent Diameter")
+    st.pyplot(fig_scatter)
+    
+    # Line plot for mean_intensity
+    fig_line, ax_line = plt.subplots(figsize=(10, 6))
+    sns.lineplot(data=df, x=df.index, y='mean_intensity', ax=ax_line)
+    plt.title("Line Plot of Mean Intensity Over Samples")
+    st.pyplot(fig_line)
 
 def run():
     uploaded_file = st.file_uploader(
@@ -116,8 +153,10 @@ def run():
         try:
             # Read the uploaded file directly as grayscale
             file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
-            image = cv2.imdecode(file_bytes, cv2.IMREAD_GRAYSCALE)
-
+            if IS_GRAY_IMAGE:
+                image = cv2.imdecode(file_bytes, cv2.IMREAD_GRAYSCALE)
+            else: 
+                image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
             # Check if image loaded successfully
             if image is None:
                 raise ValueError("Error: Unable to load image")
@@ -161,6 +200,8 @@ def run():
             # Display the pandas DataFrame
             st.subheader("Region Properties")
             st.dataframe(df)  # Display DataFrame in Streamlit
+
+            plotRockImageFeatures(df)
 
         except Exception as e:
             st.error(f"Error processing image: {str(e)}")

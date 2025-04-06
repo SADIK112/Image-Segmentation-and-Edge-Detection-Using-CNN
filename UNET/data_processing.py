@@ -2,7 +2,7 @@ import os
 import numpy as np
 import skimage.io as io
 import skimage.transform as trans
-from UNET.config import BATCH_SIZE, TRAIN_IMG_NUM, MASK_FOLDER, IMAGE_FOLDER, TRAIN_DIR, VALIDATION_DIR, VALIDATION_IMG_NUM, IMAGE_SIZE, IS_GRAY_IMAGE
+from config import BATCH_SIZE, TRAIN_IMG_NUM, MASK_FOLDER, IMAGE_FOLDER, TRAIN_DIR, VALIDATION_DIR, VALIDATION_IMG_NUM, IMAGE_SIZE, IS_GRAY_IMAGE
 
 def mask_proccess(mask):
     """Process a mask by thresholding and inverting values."""
