@@ -4,18 +4,11 @@ import os
 from skimage import transform as trans
 from skimage import exposure, color, io
 
-"""
-Description:
-This code generate more images using the augmentation technique.
-"""
 
 def apply_all_augmentations(image, mask, 
                            images_dir='augmented/images', 
                            masks_dir='augmented/masks'):
-    """
-    Apply all specified augmentations to an image and mask, 
-    and save them in separate folders with sequential filenames.
-    """
+
     # Create directories if they don't exist
     os.makedirs(images_dir, exist_ok=True)
     os.makedirs(masks_dir, exist_ok=True)
@@ -127,7 +120,7 @@ def process_all_images():
     # Get all image files from the directory, filtering out hidden files
     image_files = [f for f in sorted(os.listdir('data/train/images')) 
                   if not f.startswith('.') and f.lower().endswith(('.png', '.jpg', '.jpeg', '.tif', '.tiff'))]
-    mask_files = [f for f in sorted(os.listdir('data/train/labels')) 
+    mask_files = [f for f in sorted(os.listdir('data/train/masks')) 
                  if not f.startswith('.') and f.lower().endswith(('.png', '.jpg', '.jpeg', '.tif', '.tiff'))]
     
     total_augmented = 0
@@ -152,7 +145,7 @@ def process_all_images():
         try:
             # Load the image and mask
             image_path = os.path.join('data/train/images', img_file)
-            mask_path = os.path.join('data/train/labels', mask_file)
+            mask_path = os.path.join('data/train/masks', mask_file)
             
             image = io.imread(image_path)
             mask = io.imread(mask_path)
